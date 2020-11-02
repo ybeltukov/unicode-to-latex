@@ -4,7 +4,7 @@
 	"description": "Convert unicode symbols to latex macros",
 	"publisher": "ybeltukov",
 	"repository": "github:ybeltukov/unicode-to-latex",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.50.0"
 	},
@@ -26,12 +26,10 @@
             "type": "object",
             "title": "Unicode to LaTeX",
             "properties": {
-                "unicode-to-latex.map": {
-                    "description": "Map",
+                "unicode-to-latex.customList": {
+                    "description": "An additional list of Unicode to LaTeX replacements",
                     "type": "object",
                     "default": {
-						"α": "\\alpha",
-						"β": "\\beta"
 					}
                 },
                 "unicode-to-latex.languages": {
@@ -40,6 +38,11 @@
                     "default": [
 						"latex"
 					]
+                },
+                "unicode-to-latex.useDefaultList": {
+                    "description": "Whether to use the default list of Unicode to LaTeX replacements",
+                    "type": "boolean",
+                    "default": true
                 }
             }
         }

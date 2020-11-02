@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import {latexSymbols} from './latex';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -20,9 +21,9 @@ export function activate(context: vscode.ExtensionContext) {
 			selections.forEach( selection => {
 				let changed = false;
 				let text = document.getText(selection);
-				Object.entries(config.map as Record<string, string>).forEach(([key, val]) => { 
-					if (text.indexOf(key) > -1) {
-						text = text.split(key).join(val);
+				Object.entries(config.map).forEach(([key, val]) => { 
+					if ((val !== undefined)&&(val !== null)&&(text.indexOf(key) > -1)) {
+						text = text.split(key).join(val as string);
 						changed = true;
 					}
 				});
@@ -43,7 +44,13 @@ export function activate(context: vscode.ExtensionContext) {
 		});	
 
 	function readConfiguration() {
-		return  vscode.workspace.getConfiguration().get('unicode-to-latex') as any;
+		let config = vscode.workspace.getConfiguration().get('unicode-to-latex') as any;
+		if (config.useDefaultList) {
+			config["map"] = Object.assign(latexSymbols, config.customList);
+		} else {
+			config["map"] = config.customList;
+		}
+		return config;
 	}	
 
     vscode.workspace.onDidChangeTextDocument(changeEvent => {
@@ -71,10 +78,12 @@ export function activate(context: vscode.ExtensionContext) {
 				// console.log(change.rangeOffset);
 				// console.log(change.text);
 				// console.log(change.text.indexOf('a'));
-				let newText = change.text;
 				if (change.text in config.map) {
-					editBuilder.delete(newRange); 
-					editBuilder.insert(newRange.start, config.map[change.text]);
+					let newText = config.map[change.text];
+					if ((newText !== undefined) && (newText !== null)) {
+						editBuilder.delete(newRange);
+						editBuilder.insert(newRange.start, newText);
+					}
 				}
 			});
 		},
