@@ -6,18 +6,31 @@ import * as vscode from 'vscode';
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "unicode-to-latex" is now active!');
+	let disposable = vscode.commands.registerCommand('unicode-to-latex.replace-selected', () => {
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('unicode-to-latex.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+		let editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			return;
+		}
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Unicode to LaTeX!');
+		let selections = editor.selections;
+		let document = editor.document;
+
+		editor.edit(editBuilder => {
+			selections.forEach( selection => {
+				let changed = false;
+				let text = document.getText(selection);
+				Object.entries(config.map as Record<string, string>).forEach(([key, val]) => { 
+					if (text.indexOf(key) > -1) {
+						text = text.split(key).join(val);
+						changed = true;
+					}
+				});
+				if (changed) {
+					editBuilder.replace(selection, text);
+				}				
+			});
+		});
 	});
 
 	context.subscriptions.push(disposable);
@@ -59,23 +72,16 @@ export function activate(context: vscode.ExtensionContext) {
 				// console.log(change.text);
 				// console.log(change.text.indexOf('a'));
 				let newText = change.text;
-				let changed = false;
-				Object.entries(config.map as Record<string, string>).forEach(([key, val]) => { 
-					if (change.text.indexOf(key) > -1) {
-						newText = newText.split(key).join(val);
-						changed = true;
-					}
-				});
-				if (changed) {
+				if (change.text in config.map) {
 					editBuilder.delete(newRange); 
-					editBuilder.insert(newRange.start, newText); 
+					editBuilder.insert(newRange.start, config.map[change.text]);
 				}
 			});
 		},
 		{
 			undoStopAfter: false,
 			undoStopBefore: false,
-		}).then(status => console.log(status));
+		});
    });	
 }
 

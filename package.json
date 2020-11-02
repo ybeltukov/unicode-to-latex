@@ -4,7 +4,7 @@
 	"description": "Convert unicode symbols to latex macros",
 	"publisher": "ybeltukov",
 	"repository": "github:ybeltukov/unicode-to-latex",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.50.0"
 	},
@@ -18,8 +18,8 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "unicode-to-latex.helloWorld",
-				"title": "Hello World"
+				"command": "unicode-to-latex.replace-selected",
+				"title": "Replace Unicode symbols to LaTeX macros in selected text"
 			}
 		],
         "configuration": {
